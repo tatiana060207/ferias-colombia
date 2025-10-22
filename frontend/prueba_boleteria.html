@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Probar boletería</title>
+</head>
+<body>
+  <h2>Probar API boletería (POST)</h2>
+  <button onclick="probar()">Enviar datos</button>
+
+  <pre id="resultado"></pre>
+
+  <script>
+    async function probar() {
+      const data = {
+        id_evento: 1,
+        boleteria: [
+          { id_localidad: 1, valor: 80000, cantidad: 100 },
+          { id_localidad: 2, valor: 60000, cantidad: 200 }
+        ]
+      };
+
+      try {
+        const res = await fetch("http://localhost/ferias-colombia/backend/api/boleteria.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+        document.getElementById("resultado").textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        document.getElementById("resultado").textContent = "Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
