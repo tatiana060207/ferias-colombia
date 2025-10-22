@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-require_once __DIR__ . '/../config/conexion.php';
+require_once '../backend/config/conexion.php';
 
 function jsonResponse($data, $status = 200) {
     http_response_code($status);

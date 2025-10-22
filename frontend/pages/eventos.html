@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Eventos - Ferias Colombia</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script defer src="../js/main.js"></script>
+</head>
+<body class="bg-light">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🎪 Ferias Colombia</a>
+      <div class="d-flex align-items-center">
+        <span id="nombreUsuario" class="text-white me-3"></span>
+        <button id="btnLogout" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h1 class="fw-bold">Gestión de Eventos</h1>
+      <p class="text-muted">Crea, edita y administra los eventos del sistema.</p>
+    </div>
+
+    <!-- FORMULARIO PARA CREAR/EDITAR EVENTO -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Crear/Editar Evento</h5>
+      </div>
+      <div class="card-body">
+        <form id="formEvento">
+          <input type="hidden" id="eventoId" name="id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nombre" class="form-label">Nombre del Evento</label>
+              <input type="text" class="form-control" id="nombre" required>
+            </div>
+            <div class="col-md-6">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" rows="2"></textarea>
+            </div>
+            <div class="col-md-4">
+              <label for="fecha" class="form-label">Fecha</label>
+              <input type="date" class="form-control" id="fecha" required>
+            </div>
+            <div class="col-md-4">
+              <label for="hora" class="form-label">Hora</label>
+              <input type="time" class="form-control" id="hora" required>
+            </div>
+            <div class="col-md-4">
+              <label for="localidad_id" class="form-label">Localidad</label>
+              <select class="form-select" id="localidad_id" required>
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">Guardar Evento</button>
+              <button type="button" class="btn btn-secondary" id="btnLimpiar">Limpiar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LISTA DE EVENTOS -->
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Lista de Eventos</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="tablaEventos">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Localidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Los eventos se cargarán aquí dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPRA DE BOLETAS (SOLO PARA USUARIOS AUTENTICADOS) -->
+    <div id="seccionCompra" class="mt-5" style="display: none;">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">🛒 Comprar Boletos</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Información:</strong> Solo usuarios autenticados pueden comprar boletos. Máximo 10 boletos por localidad por transacción.
+          </div>
+
+          <form id="formCompra">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="eventoCompra" class="form-label">Evento</label>
+                <select class="form-select" id="eventoCompra" required>
+                  <option value="">Seleccione un evento...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="localidadCompra" class="form-label">Localidad</label>
+                <select class="form-select" id="localidadCompra" required>
+                  <option value="">Primero seleccione un evento</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="cantidadCompra" class="form-label">Cantidad de Boletos</label>
+                <input type="number" class="form-control" id="cantidadCompra" min="1" max="10" required>
+                <div class="form-text">Máximo 10 boletos por transacción</div>
+              </div>
+              <div class="col-md-4">
+                <label for="precioUnitario" class="form-label">Precio Unitario</label>
+                <input type="text" class="form-control" id="precioUnitario" readonly>
+              </div>
+              <div class="col-md-4">
+                <label for="valorTotal" class="form-label">Valor Total</label>
+                <input type="text" class="form-control fw-bold" id="valorTotal" readonly>
+              </div>
+              <div class="col-md-6">
+                <label for="metodoPago" class="form-label">Método de Pago</label>
+                <select class="form-select" id="metodoPago" required>
+                  <option value="">Seleccione...</option>
+                  <option value="Tarjeta">Tarjeta de Crédito/Débito</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Transferencia">Transferencia Bancaria</option>
+                </select>
+              </div>
+              <div class="col-md-6" id="campoTarjeta" style="display: none;">
+                <label for="numeroTarjeta" class="form-label">Número de Tarjeta (15 dígitos)</label>
+                <input type="text" class="form-control" id="numeroTarjeta" pattern="[0-9]{15}" maxlength="15" placeholder="123456789012345">
+                <div class="form-text">Solo para pruebas - ingrese 15 dígitos</div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="fas fa-credit-card"></i> Realizar Compra
+                </button>
+                <button type="button" class="btn btn-secondary" id="btnCancelarCompra">Cancelar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOTSTRAP JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/eventos.js"></script>
+</body>
+</html>

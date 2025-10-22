@@ -6,7 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include '../config/conexion.php';
+require_once '../backend/config/conexion.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -41,14 +41,13 @@ switch ($method) {
 
         // Validar si el artista ya está asociado a otro evento en el mismo horario
         $validacion = $pdo->prepare("
-            SELECT ea.id_evento 
+            SELECT ea.id_evento, e.nombre as nombre_evento, e.fecha_inicio, e.fecha_fin
             FROM evento_artista ea
-            INNER JOIN eventos e1 ON ea.id_evento = e1.id
+            INNER JOIN eventos e ON ea.id_evento = e.id
             INNER JOIN eventos e2 ON e2.id = :id_evento
             WHERE ea.id_artista = :id_artista
               AND (
-                (e1.fecha_inicio BETWEEN e2.fecha_inicio AND e2.fecha_fin)
-                OR (e1.fecha_fin BETWEEN e2.fecha_inicio AND e2.fecha_fin)
+                (e.fecha_inicio < e2.fecha_fin AND e.fecha_fin > e2.fecha_inicio)
               )
         ");
         $validacion->execute([
@@ -57,8 +56,14 @@ switch ($method) {
         ]);
 
         if ($validacion->rowCount() > 0) {
+            $conflicto = $validacion->fetch(PDO::FETCH_ASSOC);
             http_response_code(409);
-            echo json_encode(['error' => 'El artista ya está asignado a otro evento en el mismo horario']);
+            echo json_encode([
+                'error' => 'El artista ya está asignado a otro evento en el mismo horario',
+                'evento_conflicto' => $conflicto['nombre_evento'],
+                'fecha_inicio' => $conflicto['fecha_inicio'],
+                'fecha_fin' => $conflicto['fecha_fin']
+            ]);
             exit;
         }
 
