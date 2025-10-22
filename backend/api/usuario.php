@@ -23,10 +23,10 @@ if ($method === 'POST') {
     // ---------------------------
     // REGISTRO (acción = "registro")
     // Campos esperados:
-    // nombres, apellidos, tipo_documento, numero_documento, correo, telefono, contraseña
+    // nombres, apellidos, tipo_documento, numero_documento, correo, telefono, contrasena
     // ---------------------------
     if ($input['accion'] === 'registro') {
-        $required = ['nombres','apellidos','tipo_documento','numero_documento','correo','contraseña'];
+        $required = ['nombres','apellidos','tipo_documento','numero_documento','correo','contrasena'];
         foreach ($required as $r) {
             if (empty($input[$r])) err("Falta el campo obligatorio: $r");
         }
@@ -36,11 +36,11 @@ if ($method === 'POST') {
         $check->execute([':correo' => $input['correo'], ':ndoc' => $input['numero_documento']]);
         if ($check->fetch()) err("El correo o número de documento ya está registrado", 409);
 
-        // Hashear contraseña
-        $hash = password_hash($input['contraseña'], PASSWORD_BCRYPT);
+        // Hashear contrasena
+        $hash = password_hash($input['contrasena'], PASSWORD_BCRYPT);
 
         // Insertar (nota: si no proveen telefono, usar NULL)
-        $sql = "INSERT INTO usuarios (nombres, apellidos, tipo_documento, numero_documento, correo, telefono, `contraseña`)
+        $sql = "INSERT INTO usuarios (nombres, apellidos, tipo_documento, numero_documento, correo, telefono, `contrasena`)
                 VALUES (:nombres, :apellidos, :tipo_documento, :numero_documento, :correo, :telefono, :pass)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -59,22 +59,22 @@ if ($method === 'POST') {
 
     // ---------------------------
     // LOGIN (acción = "login")
-    // Campos: correo, contraseña
+    // Campos: correo, contrasena
     // ---------------------------
     if ($input['accion'] === 'login') {
-        if (empty($input['correo']) || empty($input['contraseña'])) err("Faltan datos de acceso");
+        if (empty($input['correo']) || empty($input['contrasena'])) err("Faltan datos de acceso");
 
-        $stmt = $pdo->prepare("SELECT id, nombres, apellidos, tipo_documento, numero_documento, correo, telefono, `contraseña`, fecha_registro FROM usuarios WHERE correo = :correo");
+        $stmt = $pdo->prepare("SELECT id, nombres, apellidos, tipo_documento, numero_documento, correo, telefono, `contrasena`, fecha_registro FROM usuarios WHERE correo = :correo");
         $stmt->execute([':correo' => $input['correo']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) err("Correo o contraseña incorrectos", 401);
+        if (!$user) err("Correo o contrasena incorrectos", 401);
 
-        // password_verify con columna `contraseña`
-        if (!password_verify($input['contraseña'], $user['contraseña'])) err("Correo o contraseña incorrectos", 401);
+        // password_verify con columna `contrasena`
+        if (!password_verify($input['contrasena'], $user['contrasena'])) err("Correo o contrasena incorrectos", 401);
 
-        // No enviar la contraseña al frontend
-        unset($user['contraseña']);
+        // No enviar la contrasena al frontend
+        unset($user['contrasena']);
 
         echo json_encode([
             'message' => 'Inicio de sesión exitoso',

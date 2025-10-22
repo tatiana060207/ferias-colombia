@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+  <div class="card p-4 shadow-lg" style="width: 25rem;">
+    <h3 class="text-center mb-3">Registro de Usuario</h3>
+    <form id="formRegistro">
+
+      <div class="mb-3">
+        <label for="nombres" class="form-label">Nombres</label>
+        <input type="text" class="form-control" id="nombres" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="apellidos" class="form-label">Apellidos</label>
+        <input type="text" class="form-control" id="apellidos" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="tipo_documento" class="form-label">Tipo de Documento</label>
+        <select id="tipo_documento" class="form-select" required>
+          <option value="">Seleccione...</option>
+          <option value="CC">Cédula de Ciudadanía</option>
+          <option value="TI">Tarjeta de Identidad</option>
+          <option value="CE">Cédula de Extranjería</option>
+          <option value="PASAPORTE">Pasaporte</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="numero_documento" class="form-label">Número de Documento</label>
+        <input type="text" class="form-control" id="numero_documento" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="correo" class="form-label">Correo Electrónico</label>
+        <input type="email" class="form-control" id="correo" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono (opcional)</label>
+        <input type="text" class="form-control" id="telefono">
+      </div>
+
+      <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="contrasena" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Registrar</button>
+    </form>
+
+    <p class="text-center mt-3">
+      ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
+    </p>
+    <div id="mensaje" class="mt-2 text-center"></div>
+  </div>
+
+  <script src="../js/usuarios.js"></script>
+</body>
+</html>
