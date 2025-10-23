@@ -1,6 +1,4 @@
 <?php
-// backend/api/boleteria.php
-// RF2 - Módulo para registrar y consultar la boletería de un evento
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
@@ -22,9 +20,6 @@ function jsonResponse($data, $status = 200) {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ==========================================================
-// OBTENER boletería de un evento (GET)
-// ==========================================================
 if ($method === 'GET') {
     if (!isset($_GET['id_evento'])) {
         jsonResponse(['error' => 'Debe enviar el parámetro id_evento'], 400);
@@ -53,9 +48,6 @@ if ($method === 'GET') {
     }
 }
 
-// ==========================================================
-// CREAR boletería para un evento (POST)
-// ==========================================================
 elseif ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 

@@ -1,6 +1,5 @@
 const API_URL = "http://localhost/ferias-colombia/api/usuario.php";
 
-// === REGISTRO ===
 const formRegistro = document.getElementById("formRegistro");
 if (formRegistro) {
   formRegistro.addEventListener("submit", async (e) => {
@@ -26,7 +25,6 @@ if (formRegistro) {
         body: JSON.stringify(data),
       });
 
-      // Si el servidor no responde correctamente
       if (!res.ok) {
         throw new Error(`Error HTTP: ${res.status}`);
       }
@@ -41,7 +39,6 @@ if (formRegistro) {
   });
 }
 
-// === LOGIN ===
 const formLogin = document.getElementById("formLogin");
 if (formLogin) {
   formLogin.addEventListener("submit", async (e) => {

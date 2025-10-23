@@ -1,7 +1,5 @@
-// frontend/js/compras.js
 const API_COMPRAS = "http://localhost/ferias-colombia/api/compras.php";
 
-// Cargar todas las compras
 async function cargarCompras() {
     try {
         const response = await fetch(API_COMPRAS);
@@ -14,7 +12,6 @@ async function cargarCompras() {
             data.compras.forEach(compra => {
                 const row = document.createElement("tr");
 
-                // Determinar clase CSS según estado
                 let estadoClass = "";
                 switch (compra.estado) {
                     case "Exitosa": estadoClass = "badge bg-success"; break;
@@ -41,7 +38,6 @@ async function cargarCompras() {
                 tbody.appendChild(row);
             });
 
-            // Actualizar estadísticas
             actualizarEstadisticas(data.compras);
         } else {
             tbody.innerHTML = '<tr><td colspan="10" class="text-center">No hay compras registradas</td></tr>';
@@ -52,7 +48,6 @@ async function cargarCompras() {
     }
 }
 
-// Actualizar estadísticas
 function actualizarEstadisticas(compras) {
     const total = compras.length;
     const exitosas = compras.filter(c => c.estado === "Exitosa").length;
@@ -63,11 +58,8 @@ function actualizarEstadisticas(compras) {
     document.getElementById("totalPendientes").textContent = `Pendientes: ${pendientes}`;
 }
 
-// Ver detalles de una compra
 async function verDetalles(id) {
     try {
-        // Para detalles completos, podríamos hacer una consulta específica
-        // Por ahora, mostramos un mensaje básico
         const modal = new bootstrap.Modal(document.getElementById('modalDetallesCompra'));
         document.getElementById('detallesCompra').innerHTML = `
             <p><strong>ID de Compra:</strong> ${id}</p>
@@ -79,7 +71,6 @@ async function verDetalles(id) {
     }
 }
 
-// Cambiar estado de una compra
 function cambiarEstado(id, estadoActual) {
     const nuevoEstado = prompt(`Estado actual: ${estadoActual}\n\nNuevo estado (Exitosa/Pendiente/Cancelada):`, estadoActual);
     if (nuevoEstado && nuevoEstado !== estadoActual) {
@@ -87,7 +78,6 @@ function cambiarEstado(id, estadoActual) {
     }
 }
 
-// Actualizar compra
 async function actualizarCompra(id, datos) {
     try {
         const formData = new FormData();
@@ -113,14 +103,12 @@ async function actualizarCompra(id, datos) {
     }
 }
 
-// Eliminar compra
 function eliminarCompra(id) {
     if (confirm("¿Está seguro de eliminar esta compra? Esta acción no se puede deshacer.")) {
         eliminarCompraAPI(id);
     }
 }
 
-// Eliminar compra via API
 async function eliminarCompraAPI(id) {
     try {
         const response = await fetch(`${API_COMPRAS}?id=${id}`, {
@@ -131,7 +119,7 @@ async function eliminarCompraAPI(id) {
 
         if (response.ok) {
             mostrarExito(result.mensaje || "Compra eliminada exitosamente");
-            cargarCompras(); // Recargar la lista
+            cargarCompras(); 
         } else {
             mostrarError(result.error || "Error al eliminar la compra");
         }
@@ -141,15 +129,11 @@ async function eliminarCompraAPI(id) {
     }
 }
 
-// Aplicar filtros
 document.getElementById("btnFiltrar").addEventListener("click", () => {
-    // Implementar lógica de filtrado
     console.log("Aplicando filtros...");
-    // Por ahora, recarga todas las compras
     cargarCompras();
 });
 
-// Limpiar filtros
 document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
     document.getElementById("filtroEstado").value = "";
     document.getElementById("filtroMetodoPago").value = "";
@@ -158,18 +142,14 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
     cargarCompras();
 });
 
-// Funciones de utilidad
 function mostrarExito(mensaje) {
-    // Implementar notificación de éxito
     alert("✅ " + mensaje);
 }
 
 function mostrarError(mensaje) {
-    // Implementar notificación de error
     alert("❌ " + mensaje);
 }
 
-// Inicializar cuando se carga la página
 document.addEventListener("DOMContentLoaded", () => {
     cargarCompras();
 });

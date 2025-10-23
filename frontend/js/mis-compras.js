@@ -1,13 +1,10 @@
-// frontend/js/mis-compras.js
 const API_COMPRAS = "http://localhost/ferias-colombia/api/compras.php";
 
-// Obtener ID del usuario desde localStorage
 function obtenerUsuarioId() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     return usuario ? usuario.id : null;
 }
 
-// Cargar compras del usuario actual
 async function cargarMisCompras(filtros = {}) {
     const usuarioId = obtenerUsuarioId();
     if (!usuarioId) {
@@ -23,7 +20,6 @@ async function cargarMisCompras(filtros = {}) {
         const data = await response.json();
 
         if (data.compras) {
-            // Aplicar filtros del lado cliente
             let comprasFiltradas = data.compras;
 
             if (filtros.evento) {
@@ -53,7 +49,6 @@ async function cargarMisCompras(filtros = {}) {
     }
 }
 
-// Mostrar compras en la tabla
 function mostrarCompras(compras) {
     const tbody = document.getElementById("tablaCompras").querySelector("tbody");
     const mensajeSinCompras = document.getElementById("mensajeSinCompras");
@@ -72,7 +67,6 @@ function mostrarCompras(compras) {
     compras.forEach(compra => {
         const row = document.createElement("tr");
 
-        // Determinar clase CSS según estado
         let estadoClass = "";
         let estadoIcon = "";
         switch (compra.estado) {
@@ -90,7 +84,6 @@ function mostrarCompras(compras) {
                 break;
         }
 
-        // Formatear fecha
         const fecha = new Date(compra.fecha_compra);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -119,7 +112,6 @@ function mostrarCompras(compras) {
     });
 }
 
-// Actualizar estadísticas personales
 function actualizarEstadisticas(compras) {
     const totalCompras = compras.length;
     const exitosas = compras.filter(c => c.estado === "Exitosa").length;
@@ -134,11 +126,8 @@ function actualizarEstadisticas(compras) {
     document.getElementById("totalGastado").textContent = `$${totalGastado.toLocaleString('es-CO')}`;
 }
 
-// Ver detalles de una compra específica
 async function verDetallesCompra(id) {
     try {
-        // Para detalles completos, podríamos hacer una consulta específica
-        // Por ahora, mostramos información básica
         const usuarioId = obtenerUsuarioId();
         const response = await fetch(`${API_COMPRAS}?usuario_id=${usuarioId}`);
         const data = await response.json();
@@ -182,7 +171,6 @@ async function verDetallesCompra(id) {
     }
 }
 
-// Buscar y filtrar compras
 document.getElementById("btnBuscar").addEventListener("click", () => {
     const filtros = {
         evento: document.getElementById("buscarEvento").value.trim(),
@@ -192,7 +180,6 @@ document.getElementById("btnBuscar").addEventListener("click", () => {
     cargarMisCompras(filtros);
 });
 
-// Limpiar filtros
 document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
     document.getElementById("buscarEvento").value = "";
     document.getElementById("filtroEstado").value = "";
@@ -200,34 +187,26 @@ document.getElementById("btnLimpiarFiltros").addEventListener("click", () => {
     cargarMisCompras();
 });
 
-// Exportar a PDF (funcionalidad básica)
 document.getElementById("btnExportar").addEventListener("click", () => {
     alert("Funcionalidad de exportación a PDF próximamente disponible");
 });
 
-// Funciones de utilidad
 function mostrarExito(mensaje) {
-    // Implementar notificación de éxito
     alert("✅ " + mensaje);
 }
 
 function mostrarError(mensaje) {
-    // Implementar notificación de error
     alert("❌ " + mensaje);
 }
 
-// Inicializar cuando se carga la página
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar autenticación
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     if (!usuario) {
         window.location.href = "login.html";
         return;
     }
 
-    // Mostrar nombre del usuario
     document.getElementById("nombreUsuario").textContent = `${usuario.nombres} ${usuario.apellidos}`;
 
-    // Cargar compras iniciales
     cargarMisCompras();
 });

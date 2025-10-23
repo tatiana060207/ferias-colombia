@@ -4,61 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Localidades - Ferias Colombia</title>
-  <link rel="stylesheet" href="../css/estilos.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script defer src="../js/main.js"></script>
 </head>
 <body class="bg-light">
 
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="#">🎪 Ferias Colombia</a>
-      <div class="d-flex align-items-center">
-        <span id="nombreUsuario" class="text-white me-3"></span>
-        <button id="btnLogout" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
-      </div>
     </div>
   </nav>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <div class="container py-5">
     <div class="text-center mb-5">
       <h1 class="fw-bold">Gestión de Localidades</h1>
       <p class="text-muted">Administra las localidades disponibles para los eventos.</p>
     </div>
 
-    <!-- FORMULARIO PARA CREAR/EDITAR LOCALIDAD -->
     <div class="card shadow mb-4">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Crear/Editar Localidad</h5>
+        <h5 class="mb-0">Registrar Nueva Localidad</h5>
       </div>
       <div class="card-body">
         <form id="formLocalidad">
-          <input type="hidden" id="localidadId" name="id">
           <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <label for="codigo" class="form-label">Código de Localidad</label>
+              <input type="text" class="form-control" id="codigo" maxlength="10" required>
+            </div>
+            <div class="col-md-8">
               <label for="nombre" class="form-label">Nombre de la Localidad</label>
-              <input type="text" class="form-control" id="nombre" required>
-            </div>
-            <div class="col-md-6">
-              <label for="direccion" class="form-label">Dirección</label>
-              <input type="text" class="form-control" id="direccion" required>
-            </div>
-            <div class="col-md-4">
-              <label for="capacidad" class="form-label">Capacidad</label>
-              <input type="number" class="form-control" id="capacidad" min="1" required>
-            </div>
-            <div class="col-md-4">
-              <label for="ciudad" class="form-label">Ciudad</label>
-              <input type="text" class="form-control" id="ciudad" required>
-            </div>
-            <div class="col-md-4">
-              <label for="departamento" class="form-label">Departamento</label>
-              <input type="text" class="form-control" id="departamento" required>
+              <input type="text" class="form-control" id="nombre" maxlength="100" required>
             </div>
             <div class="col-12">
-              <button type="submit" class="btn btn-primary">Guardar Localidad</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
               <button type="button" class="btn btn-secondary" id="btnLimpiar">Limpiar</button>
             </div>
           </div>
@@ -66,7 +44,6 @@
       </div>
     </div>
 
-    <!-- LISTA DE LOCALIDADES -->
     <div class="card shadow">
       <div class="card-header bg-secondary text-white">
         <h5 class="mb-0">Lista de Localidades</h5>
@@ -77,25 +54,83 @@
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Código</th>
                 <th>Nombre</th>
-                <th>Dirección</th>
-                <th>Capacidad</th>
-                <th>Ciudad</th>
-                <th>Departamento</th>
-                <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- Las localidades se cargarán aquí dinámicamente -->
-            </tbody>
+            <tbody></tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- BOOTSTRAP JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/localidades.js"></script>
+¿  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  const API_URL = "http://localhost/ferias-colombia/backend/api/localidades.php";
+
+  const form = document.getElementById("formLocalidad");
+  const tabla = document.querySelector("#tablaLocalidades tbody");
+  const btnLimpiar = document.getElementById("btnLimpiar");
+
+  async function cargarLocalidades() {
+    tabla.innerHTML = "<tr><td colspan='3'>Cargando...</td></tr>";
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      if (data.localidades && data.localidades.length > 0) {
+        tabla.innerHTML = data.localidades.map(l => `
+          <tr>
+            <td>${l.id}</td>
+            <td>${l.codigo_localidad}</td>
+            <td>${l.nombre_localidad}</td>
+          </tr>
+        `).join("");
+      } else {
+        tabla.innerHTML = "<tr><td colspan='3'>No hay localidades registradas.</td></tr>";
+      }
+    } catch (err) {
+      console.error(err);
+      tabla.innerHTML = "<tr><td colspan='3' class='text-danger'>Error al cargar localidades.</td></tr>";
+    }
+  }
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const codigo = document.getElementById("codigo").value.trim();
+    const nombre = document.getElementById("nombre").value.trim();
+
+    if (!codigo || !nombre) {
+      alert("Por favor completa todos los campos.");
+      return;
+    }
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo_localidad: codigo, nombre_localidad: nombre })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ Localidad registrada correctamente.");
+        form.reset();
+        cargarLocalidades();
+      } else {
+        alert("⚠️ " + (data.error || "Error desconocido."));
+      }
+    } catch (err) {
+      alert("❌ Error al conectar con el servidor.");
+      console.error(err);
+    }
+  });
+
+  btnLimpiar.addEventListener("click", () => form.reset());
+
+  cargarLocalidades();
+  </script>
 </body>
 </html>

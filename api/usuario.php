@@ -1,13 +1,9 @@
 <?php
-// backend/api/usuario.php
-
-// === CONFIGURACIÓN DE CORS ===
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-// Manejar preflight OPTIONS (CORS)
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -18,20 +14,15 @@ include '../backend/config/conexion.php'; // usa $pdo
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents("php://input"), true);
 
-// Helper para devolver error JSON y salir
 function err($msg, $code = 400) {
     http_response_code($code);
     echo json_encode(['error' => $msg]);
     exit;
 }
 
-// === MÉTODO POST ===
 if ($method === 'POST') {
     if (!isset($input['accion'])) err("Falta el campo 'accion' (registro o login)");
 
-    // ---------------------------
-    // REGISTRO (acción = "registro")
-    // ---------------------------
     if ($input['accion'] === 'registro') {
         $required = ['nombres','apellidos','tipo_documento','numero_documento','correo','contrasena'];
         foreach ($required as $r) {
@@ -39,15 +30,12 @@ if ($method === 'POST') {
         }
 
         try {
-            // Verificar existencia
             $check = $pdo->prepare("SELECT id FROM usuarios WHERE correo = :correo OR numero_documento = :ndoc");
             $check->execute([':correo' => $input['correo'], ':ndoc' => $input['numero_documento']]);
             if ($check->fetch()) err("El correo o número de documento ya está registrado", 409);
 
-            // Hashear contraseña
             $hash = password_hash($input['contrasena'], PASSWORD_BCRYPT);
 
-            // Insertar usuario (sin campo rol)
             $sql = "INSERT INTO usuarios 
                     (nombres, apellidos, tipo_documento, numero_documento, correo, telefono, contrasena) 
                     VALUES (:nombres, :apellidos, :tipo_documento, :numero_documento, :correo, :telefono, :pass)";
@@ -69,9 +57,6 @@ if ($method === 'POST') {
         exit;
     }
 
-    // ---------------------------
-    // LOGIN (acción = "login")
-    // ---------------------------
     if ($input['accion'] === 'login') {
         if (empty($input['correo']) || empty($input['contrasena'])) err("Faltan datos de acceso");
 
@@ -95,7 +80,6 @@ if ($method === 'POST') {
     err("Acción no reconocida");
 }
 
-// === MÉTODO GET ===
 if ($method === 'GET') {
     try {
         $stmt = $pdo->query("SELECT id, nombres, apellidos, tipo_documento, numero_documento, correo, telefono, fecha_registro FROM usuarios");
@@ -107,7 +91,6 @@ if ($method === 'GET') {
     exit;
 }
 
-// === MÉTODO PUT ===
 if ($method === 'PUT') {
     parse_str(file_get_contents("php://input"), $put);
     if (empty($put['id'])) err("Falta id para actualizar");
@@ -130,6 +113,5 @@ if ($method === 'PUT') {
     exit;
 }
 
-// Si llega aquí, método no permitido
 http_response_code(405);
 echo json_encode(['error' => 'Método no permitido']);

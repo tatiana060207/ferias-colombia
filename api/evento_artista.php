@@ -1,5 +1,4 @@
 <?php
-// backend/api/evento_artista.php
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -12,7 +11,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        // Obtener todas las asociaciones evento-artista
         $sql = "SELECT 
                     ea.id,
                     e.nombre AS evento,
@@ -30,7 +28,6 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Registrar una nueva asociación evento-artista
         $data = json_decode(file_get_contents("php://input"));
 
         if (!isset($data->id_evento) || !isset($data->id_artista)) {
@@ -39,7 +36,6 @@ switch ($method) {
             exit;
         }
 
-        // Validar si el artista ya está asociado a otro evento en el mismo horario
         $validacion = $pdo->prepare("
             SELECT ea.id_evento, e.nombre as nombre_evento, e.fecha_inicio, e.fecha_fin
             FROM evento_artista ea
@@ -67,7 +63,6 @@ switch ($method) {
             exit;
         }
 
-        // Insertar nueva asociación
         $sql = "INSERT INTO evento_artista (id_evento, id_artista) VALUES (:id_evento, :id_artista)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -79,7 +74,6 @@ switch ($method) {
         break;
 
     case 'DELETE':
-        // Eliminar una asociación evento-artista
         if (!isset($_GET['id'])) {
             http_response_code(400);
             echo json_encode(['error' => 'Parámetro id faltante']);

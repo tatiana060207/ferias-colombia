@@ -1,6 +1,3 @@
-// frontend/js/main.js - Funciones globales
-
-// Verificar autenticación y actualizar menú
 function verificarAutenticacion() {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const userMenu = document.getElementById('userMenu');
@@ -9,36 +6,30 @@ function verificarAutenticacion() {
     const linkAdmin = document.getElementById('linkAdmin');
 
     if (usuario && userMenu && loginMenu && registerMenu) {
-        // Usuario autenticado
         userMenu.style.display = 'block';
         loginMenu.style.display = 'none';
         registerMenu.style.display = 'none';
 
-        // Mostrar nombre del usuario
         const nombreUsuario = document.getElementById('nombreUsuario');
         if (nombreUsuario) {
             nombreUsuario.textContent = `${usuario.nombres} ${usuario.apellidos}`;
         }
 
-        // Mostrar enlace admin si es admin (puedes agregar lógica aquí)
         if (linkAdmin) {
             linkAdmin.style.display = 'block'; // Por ahora siempre visible, puedes agregar lógica de roles
         }
     } else {
-        // Usuario no autenticado
         if (userMenu) userMenu.style.display = 'none';
         if (loginMenu) loginMenu.style.display = 'block';
         if (registerMenu) registerMenu.style.display = 'block';
     }
 }
 
-// Función de logout
 function logout() {
     localStorage.removeItem('usuario');
     window.location.href = 'index.html';
 }
 
-// Cargar eventos destacados en la página principal
 async function cargarEventosDestacados() {
     try {
         const response = await fetch('http://localhost/ferias-colombia/api/eventos.php');
@@ -47,7 +38,6 @@ async function cargarEventosDestacados() {
         const container = document.getElementById('eventosDestacados');
         if (!container || !data.eventos) return;
 
-        // Mostrar solo los primeros 3 eventos
         const eventosDestacados = data.eventos.slice(0, 3);
 
         container.innerHTML = '';
@@ -73,25 +63,20 @@ async function cargarEventosDestacados() {
     }
 }
 
-// Cargar estadísticas generales
 async function cargarEstadisticas() {
     try {
-        // Cargar eventos
         const eventosResponse = await fetch('http://localhost/ferias-colombia/api/eventos.php');
         const eventosData = await eventosResponse.json();
         document.getElementById('totalEventos').textContent = eventosData.eventos ? eventosData.eventos.length : 0;
 
-        // Cargar artistas
         const artistasResponse = await fetch('http://localhost/ferias-colombia/api/artistas.php');
         const artistasData = await artistasResponse.json();
         document.getElementById('totalArtistas').textContent = artistasData.artistas ? artistasData.artistas.length : 0;
 
-        // Cargar compras
         const comprasResponse = await fetch('http://localhost/ferias-colombia/api/compras.php');
         const comprasData = await comprasResponse.json();
         document.getElementById('totalCompras').textContent = comprasData.compras ? comprasData.compras.length : 0;
 
-        // Cargar usuarios
         const usuariosResponse = await fetch('http://localhost/ferias-colombia/api/usuario.php');
         const usuariosData = await usuariosResponse.json();
         document.getElementById('totalUsuarios').textContent = Array.isArray(usuariosData) ? usuariosData.length : 0;
@@ -101,11 +86,9 @@ async function cargarEstadisticas() {
     }
 }
 
-// Inicializar cuando se carga cualquier página
 document.addEventListener('DOMContentLoaded', function() {
     verificarAutenticacion();
 
-    // Agregar event listener para logout
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', function(e) {
@@ -114,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Cargar contenido específico de la página principal
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/ferias-colombia/')) {
         cargarEventosDestacados();
         cargarEstadisticas();

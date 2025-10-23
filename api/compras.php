@@ -1,5 +1,4 @@
 <?php
-// api/compras.php
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -21,9 +20,6 @@ function jsonResponse($data, $status = 200) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    // =====================================
-    // OBTENER COMPRAS (TODAS O POR USUARIO)
-    // =====================================
     $usuario_id = $_GET['usuario_id'] ?? null;
 
     try {
@@ -69,16 +65,12 @@ if ($method === 'GET') {
 }
 
 elseif ($method === 'POST') {
-    // =====================================
-    // CREAR UNA NUEVA COMPRA
-    // =====================================
     $input = json_decode(file_get_contents('php://input'), true);
 
     if (!$input) {
         jsonResponse(['error' => 'Cuerpo JSON vacío o inválido'], 400);
     }
 
-    // Validar campos requeridos
     $required = ['id_usuario', 'id_evento', 'id_localidad', 'cantidad', 'valor_total', 'metodo_pago'];
     foreach ($required as $field) {
         if (!isset($input[$field]) || $input[$field] === '') {
@@ -86,13 +78,11 @@ elseif ($method === 'POST') {
         }
     }
 
-    // Validar cantidad máxima (RF8: máximo 10 boletos por transacción)
     if ($input['cantidad'] < 1 || $input['cantidad'] > 10) {
         jsonResponse(['error' => 'La cantidad de boletos debe estar entre 1 y 10 por transacción'], 400);
     }
 
     try {
-        // Verificar que existan las referencias
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE id = ?");
         $stmt->execute([$input['id_usuario']]);
         if ($stmt->fetchColumn() == 0) {
@@ -111,7 +101,22 @@ elseif ($method === 'POST') {
             jsonResponse(['error' => 'Localidad no encontrada'], 404);
         }
 
-        // Insertar compra
+        $stmt = $pdo->prepare("SELECT cantidad_disponible FROM boleteria WHERE id_evento = ? AND id_localidad = ?");
+        $stmt->execute([$input['id_evento'], $input['id_localidad']]);
+        $boleteria = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$boleteria) {
+            jsonResponse(['error' => 'No existe boletería para este evento y localidad'], 404);
+        }
+
+        if ($boleteria['cantidad_disponible'] < $input['cantidad']) {
+            jsonResponse([
+                'error' => 'No hay suficientes boletos disponibles',
+                'disponibles' => $boleteria['cantidad_disponible'],
+                'solicitados' => $input['cantidad']
+            ], 400);
+        }
+
         $stmt = $pdo->prepare("
             INSERT INTO compras
             (id_usuario, id_evento, id_localidad, cantidad, valor_total, metodo_pago, numero_tarjeta, estado)
@@ -130,7 +135,13 @@ elseif ($method === 'POST') {
 
         $id = $pdo->lastInsertId();
 
-        // Obtener la compra creada con joins
+        $stmt = $pdo->prepare("
+            UPDATE boleteria
+            SET cantidad_disponible = cantidad_disponible - ?
+            WHERE id_evento = ? AND id_localidad = ?
+        ");
+        $stmt->execute([$input['cantidad'], $input['id_evento'], $input['id_localidad']]);
+
         $stmt = $pdo->prepare("
             SELECT
                 c.id,
@@ -167,9 +178,6 @@ elseif ($method === 'POST') {
 }
 
 elseif ($method === 'PUT') {
-    // =====================================
-    // ACTUALIZAR UNA COMPRA
-    // =====================================
     parse_str(file_get_contents('php://input'), $put);
 
     if (!isset($put['id'])) {
@@ -177,14 +185,12 @@ elseif ($method === 'PUT') {
     }
 
     try {
-        // Verificar que la compra existe
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM compras WHERE id = ?");
         $stmt->execute([$put['id']]);
         if ($stmt->fetchColumn() == 0) {
             jsonResponse(['error' => 'Compra no encontrada'], 404);
         }
 
-        // Actualizar solo campos permitidos (estado)
         $stmt = $pdo->prepare("UPDATE compras SET estado = ? WHERE id = ?");
         $stmt->execute([$put['estado'] ?? 'Pendiente', $put['id']]);
 
@@ -196,9 +202,6 @@ elseif ($method === 'PUT') {
 }
 
 elseif ($method === 'DELETE') {
-    // =====================================
-    // ELIMINAR UNA COMPRA
-    // =====================================
     $id = $_GET['id'] ?? null;
 
     if (!$id) {
@@ -206,14 +209,12 @@ elseif ($method === 'DELETE') {
     }
 
     try {
-        // Verificar que la compra existe
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM compras WHERE id = ?");
         $stmt->execute([$id]);
         if ($stmt->fetchColumn() == 0) {
             jsonResponse(['error' => 'Compra no encontrada'], 404);
         }
 
-        // Eliminar compra
         $stmt = $pdo->prepare("DELETE FROM compras WHERE id = ?");
         $stmt->execute([$id]);
 

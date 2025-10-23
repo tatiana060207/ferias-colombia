@@ -10,7 +10,6 @@
 </head>
 <body class="bg-light">
 
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="#">🎪 Ferias Colombia</a>
@@ -21,14 +20,12 @@
     </div>
   </nav>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <div class="container py-5">
     <div class="text-center mb-5">
       <h1 class="fw-bold">Mis Compras</h1>
       <p class="text-muted">Historial completo de tus compras realizadas en la plataforma.</p>
     </div>
 
-    <!-- FILTROS Y BÚSQUEDA -->
     <div class="card shadow mb-4">
       <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Buscar y Filtrar Compras</h5>
@@ -68,7 +65,6 @@
       </div>
     </div>
 
-    <!-- ESTADÍSTICAS PERSONALES -->
     <div class="row mb-4">
       <div class="col-md-3">
         <div class="card text-center border-primary">
@@ -104,7 +100,6 @@
       </div>
     </div>
 
-    <!-- LISTA DE COMPRAS -->
     <div class="card shadow">
       <div class="card-header bg-info text-white">
         <h5 class="mb-0">Historial de Compras</h5>
@@ -124,7 +119,6 @@
               </tr>
             </thead>
             <tbody>
-              <!-- Las compras se cargarán aquí dinámicamente -->
             </tbody>
           </table>
         </div>
@@ -136,7 +130,6 @@
     </div>
   </div>
 
-  <!-- MODAL PARA DETALLES DE COMPRA -->
   <div class="modal fade" id="modalDetallesCompra" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -145,7 +138,6 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" id="detallesCompra">
-          <!-- Los detalles se cargarán aquí -->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -154,7 +146,6 @@
     </div>
   </div>
 
-  <!-- BOOTSTRAP JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/mis-compras.js"></script>
 </body>

@@ -1,9 +1,7 @@
-// frontend/js/boletos.js
 const API_EVENTOS = "http://localhost/ferias-colombia/api/eventos.php";
 const API_LOCALIDADES = "http://localhost/ferias-colombia/api/localidades.php";
 const API_BOLETERIA = "http://localhost/ferias-colombia/api/boleteria.php";
 
-// Cargar eventos en el select
 async function cargarEventos() {
     try {
         const response = await fetch(API_EVENTOS);
@@ -25,7 +23,6 @@ async function cargarEventos() {
     }
 }
 
-// Cargar localidades en el select
 async function cargarLocalidades() {
     try {
         const response = await fetch(API_LOCALIDADES);
@@ -47,7 +44,6 @@ async function cargarLocalidades() {
     }
 }
 
-// Cargar boletería de un evento
 async function cargarBoleteria(eventoId = null) {
     if (!eventoId) {
         eventoId = document.getElementById("evento_id").value;
@@ -92,7 +88,6 @@ async function cargarBoleteria(eventoId = null) {
     }
 }
 
-// Agregar boleto al formulario
 function agregarBoleto() {
     const container = document.getElementById("boletosContainer");
     const boletoDiv = document.createElement("div");
@@ -121,11 +116,9 @@ function agregarBoleto() {
 
     container.appendChild(boletoDiv);
 
-    // Cargar localidades en el nuevo select
     cargarLocalidadesEnSelect(boletoDiv.querySelector('.localidad-select'));
 }
 
-// Cargar localidades en un select específico
 async function cargarLocalidadesEnSelect(select) {
     try {
         const response = await fetch(API_LOCALIDADES);
@@ -146,12 +139,10 @@ async function cargarLocalidadesEnSelect(select) {
     }
 }
 
-// Eliminar item de boleto del formulario
 function eliminarBoletoItem(button) {
     button.closest('.boleto-item').remove();
 }
 
-// Guardar boletería
 async function guardarBoleteria() {
     const eventoId = document.getElementById("evento_id").value;
     if (!eventoId) {
@@ -208,14 +199,12 @@ async function guardarBoleteria() {
     }
 }
 
-// Limpiar formulario
 function limpiarFormulario() {
     document.getElementById("boletosContainer").innerHTML = '';
     document.getElementById("evento_id").value = '';
-    cargarBoleteria(); // Limpiar lista
+    cargarBoleteria();
 }
 
-// Funciones de utilidad
 function mostrarExito(mensaje) {
     alert("✅ " + mensaje);
 }
@@ -224,17 +213,14 @@ function mostrarError(mensaje) {
     alert("❌ " + mensaje);
 }
 
-// Event listeners
 document.addEventListener("DOMContentLoaded", () => {
     cargarEventos();
     cargarLocalidades();
 
-    // Event listener para cambio de evento
     document.getElementById("evento_id").addEventListener("change", (e) => {
         cargarBoleteria(e.target.value);
     });
 
-    // Event listeners para botones
     document.getElementById("btnAgregarBoleto").addEventListener("click", agregarBoleto);
     document.getElementById("btnGuardar").addEventListener("click", guardarBoleteria);
     document.getElementById("btnLimpiar").addEventListener("click", limpiarFormulario);

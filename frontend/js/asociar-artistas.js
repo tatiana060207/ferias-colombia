@@ -1,9 +1,7 @@
-// frontend/js/asociar-artistas.js
 const API_EVENTOS = "http://localhost/ferias-colombia/api/eventos.php";
 const API_ARTISTAS = "http://localhost/ferias-colombia/api/artistas.php";
 const API_ASOCIACIONES = "http://localhost/ferias-colombia/api/evento_artista.php";
 
-// Cargar eventos en el select
 async function cargarEventos() {
     try {
         const response = await fetch(API_EVENTOS);
@@ -25,7 +23,6 @@ async function cargarEventos() {
     }
 }
 
-// Cargar artistas en el select
 async function cargarArtistas() {
     try {
         const response = await fetch(API_ARTISTAS);
@@ -47,7 +44,6 @@ async function cargarArtistas() {
     }
 }
 
-// Cargar asociaciones evento-artista
 async function cargarAsociaciones() {
     try {
         const response = await fetch(API_ASOCIACIONES);
@@ -84,7 +80,6 @@ async function cargarAsociaciones() {
     }
 }
 
-// Crear nueva asociación
 async function crearAsociacion() {
     const eventoId = document.getElementById("evento_id").value;
     const artistaId = document.getElementById("artista_id").value;
@@ -111,7 +106,6 @@ async function crearAsociacion() {
             limpiarFormulario();
             cargarAsociaciones();
         } else if (response.status === 409) {
-            // Conflicto de horario - mostrar modal
             mostrarConflicto(result);
         } else {
             mostrarError(result.error || "Error al crear la asociación");
@@ -122,7 +116,6 @@ async function crearAsociacion() {
     }
 }
 
-// Mostrar modal de conflicto
 function mostrarConflicto(detalles) {
     const modal = new bootstrap.Modal(document.getElementById('modalConflicto'));
     document.getElementById('detallesConflicto').innerHTML = `
@@ -140,14 +133,12 @@ function mostrarConflicto(detalles) {
     modal.show();
 }
 
-// Eliminar asociación
 function eliminarAsociacion(id) {
     if (confirm("¿Está seguro de desasociar este artista del evento?")) {
         eliminarAsociacionAPI(id);
     }
 }
 
-// Eliminar asociación via API
 async function eliminarAsociacionAPI(id) {
     try {
         const response = await fetch(`${API_ASOCIACIONES}?id=${id}`, {
@@ -168,13 +159,11 @@ async function eliminarAsociacionAPI(id) {
     }
 }
 
-// Limpiar formulario
 function limpiarFormulario() {
     document.getElementById("evento_id").value = "";
     document.getElementById("artista_id").value = "";
 }
 
-// Funciones de utilidad
 function mostrarExito(mensaje) {
     alert("✅ " + mensaje);
 }
@@ -183,18 +172,15 @@ function mostrarError(mensaje) {
     alert("❌ " + mensaje);
 }
 
-// Event listeners
 document.addEventListener("DOMContentLoaded", () => {
     cargarEventos();
     cargarArtistas();
     cargarAsociaciones();
 
-    // Event listener para el formulario
     document.getElementById("formAsociacion").addEventListener("submit", (e) => {
         e.preventDefault();
         crearAsociacion();
     });
 
-    // Event listener para limpiar
     document.getElementById("btnLimpiar").addEventListener("click", limpiarFormulario);
 });

@@ -1,20 +1,16 @@
 <?php
-// backend/api/artistas.php
 
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-require_once '../backend/config/conexion.php';
+include_once __DIR__ . '/../backend/config/conexion.php'; // <- ruta correcta
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
 
-    // =====================================
-    // GET → listar artistas o uno en específico
-    // =====================================
     case 'GET':
         if (isset($_GET['id'])) {
             $stmt = $pdo->prepare("SELECT * FROM artistas WHERE id = ?");
@@ -22,15 +18,12 @@ switch ($method) {
             $artista = $stmt->fetch();
             echo json_encode($artista ?: ["mensaje" => "Artista no encontrado"]);
         } else {
-            $stmt = $pdo->query("SELECT * FROM artistas");
+            $stmt = $pdo->query("SELECT * FROM artistas ORDER BY id DESC");
             $artistas = $stmt->fetchAll();
             echo json_encode($artistas);
         }
         break;
 
-    // =====================================
-    // POST → crear artista nuevo
-    // =====================================
     case 'POST':
         $data = json_decode(file_get_contents("php://input"), true);
 
@@ -40,6 +33,7 @@ switch ($method) {
             empty($data['genero_musical']) ||
             empty($data['ciudad_natal'])
         ) {
+            http_response_code(400);
             echo json_encode(["error" => "Faltan datos obligatorios"]);
             exit;
         }
@@ -53,23 +47,22 @@ switch ($method) {
         ]);
 
         if ($ok) {
-            echo json_encode(["mensaje" => "Artista registrado correctamente"]);
+            http_response_code(201);
+            echo json_encode(["mensaje" => "Artista registrado correctamente", "id" => $pdo->lastInsertId()]);
         } else {
+            http_response_code(500);
             echo json_encode(["error" => "Error al registrar artista"]);
         }
         break;
 
-    // =====================================
-    // PUT → actualizar artista existente
-    // =====================================
     case 'PUT':
         if (!isset($_GET['id'])) {
+            http_response_code(400);
             echo json_encode(["error" => "Falta el ID del artista"]);
             exit;
         }
 
         $data = json_decode(file_get_contents("php://input"), true);
-
         $stmt = $pdo->prepare("UPDATE artistas 
                                SET nombres = ?, apellidos = ?, genero_musical = ?, ciudad_natal = ? 
                                WHERE id = ?");
@@ -81,17 +74,12 @@ switch ($method) {
             $_GET['id']
         ]);
 
-        echo json_encode($ok
-            ? ["mensaje" => "Artista actualizado correctamente"]
-            : ["error" => "Error al actualizar artista"]
-        );
+        echo json_encode($ok ? ["mensaje" => "Artista actualizado correctamente"] : ["error" => "Error al actualizar artista"]);
         break;
 
-    // =====================================
-    // DELETE → eliminar artista
-    // =====================================
     case 'DELETE':
         if (!isset($_GET['id'])) {
+            http_response_code(400);
             echo json_encode(["error" => "Falta el ID del artista"]);
             exit;
         }
@@ -99,14 +87,11 @@ switch ($method) {
         $stmt = $pdo->prepare("DELETE FROM artistas WHERE id = ?");
         $ok = $stmt->execute([$_GET['id']]);
 
-        echo json_encode($ok
-            ? ["mensaje" => "Artista eliminado correctamente"]
-            : ["error" => "Error al eliminar artista"]
-        );
+        echo json_encode($ok ? ["mensaje" => "Artista eliminado correctamente"] : ["error" => "Error al eliminar artista"]);
         break;
 
     default:
+        http_response_code(405);
         echo json_encode(["error" => "Método no permitido"]);
         break;
 }
-?>
